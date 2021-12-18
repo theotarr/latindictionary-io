@@ -1,0 +1,1 @@
+# latindictionary-api-client
