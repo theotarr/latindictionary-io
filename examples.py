@@ -1,19 +1,3 @@
-# latindictionary-io API Client
-
- - API documentation: https://latindictionary.io/docs/api
- - API version: 1.0.0
-
-## Installation
-
-Install package
-
-```sh
-pip install latindictionary-io
-```
-
-## Getting Started
-
-``` python
 import latindictionary_io
 
 # setup the api client
@@ -30,4 +14,4 @@ print(dictionary.get_definition('canis'))
 
 # get the word of the day from a specified date
 print(dictionary.get_word_of_the_day('2022-01-01'))
-```
+
