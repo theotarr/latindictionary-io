@@ -56,4 +56,4 @@ class Client:
         Returns:
             json: json response from the API with the Word of the Day from the specified date.
         """
-        return self.request('GET', 'wordoftheday')
+        return self.request('GET', 'word_of_the_day')
