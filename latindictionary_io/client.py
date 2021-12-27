@@ -2,7 +2,7 @@ import requests
 from latindictionary_io.exceptions import APIException, RequestException
 
 class Client:
-    API_URL = 'https://latindictionary.io/api/v1/'
+    API_URL = 'https://www.latindictionary.io/api/v1/'
     
     def request(self, method, endpoint, params=None):
         url = self.API_URL + endpoint
@@ -56,4 +56,4 @@ class Client:
         Returns:
             json: json response from the API with the Word of the Day from the specified date.
         """
-        return self.request('GET', 'wordoftheday')
+        # return self.request('GET', 'wordoftheday/')
