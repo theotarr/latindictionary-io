@@ -1,9 +1,9 @@
 from __future__ import annotations
-"""Synchronous client for the latindictionary.io REST API."""
+"""Asynchronous client for the latindictionary.io REST API."""
 
 
 
-import time
+import asyncio
 from typing import Any
 
 import httpx
@@ -18,13 +18,13 @@ from ._base import (
 )
 
 
-class Client:
-    """Synchronous client for latindictionary.io.
+class AsyncClient:
+    """Asynchronous client for latindictionary.io.
 
     Usage::
 
-        with Client() as client:
-            result = client.latin_to_english("canis")
+        async with AsyncClient() as client:
+            result = await client.latin_to_english("canis")
     """
 
     def __init__(
@@ -36,23 +36,23 @@ class Client:
     ) -> None:
         self._base_url = base_url.rstrip("/")
         self._max_retries = max_retries
-        self._client = httpx.Client(timeout=timeout)
+        self._client = httpx.AsyncClient(timeout=timeout)
 
     # -- context manager -----------------------------------------------------
 
-    def __enter__(self) -> Client:
+    async def __aenter__(self) -> AsyncClient:
         return self
 
-    def __exit__(self, *args: object) -> None:
-        self.close()
+    async def __aexit__(self, *args: object) -> None:
+        await self.close()
 
-    def close(self) -> None:
+    async def close(self) -> None:
         """Close the underlying HTTP client."""
-        self._client.close()
+        await self._client.aclose()
 
     # -- internal request layer ----------------------------------------------
 
-    def _request(
+    async def _request(
         self,
         path: str,
         params: dict[str, Any] | None = None,
@@ -62,24 +62,24 @@ class Client:
 
         for attempt in range(self._max_retries + 1):
             try:
-                response = self._client.get(url, params=params)
+                response = await self._client.get(url, params=params)
             except httpx.TimeoutException as exc:
                 last_exc = exc
                 if attempt < self._max_retries:
-                    time.sleep(calculate_backoff(attempt))
+                    await asyncio.sleep(calculate_backoff(attempt))
                     continue
                 raise exceptions.TimeoutError(str(exc)) from exc
             except httpx.ConnectError as exc:
                 last_exc = exc
                 if attempt < self._max_retries:
-                    time.sleep(calculate_backoff(attempt))
+                    await asyncio.sleep(calculate_backoff(attempt))
                     continue
                 raise exceptions.ConnectionError(str(exc)) from exc
 
             if response.status_code == 429:
                 last_exc = exceptions.RateLimitError()
                 if attempt < self._max_retries:
-                    time.sleep(calculate_backoff(attempt))
+                    await asyncio.sleep(calculate_backoff(attempt))
                     continue
                 raise last_exc
 
@@ -92,7 +92,7 @@ class Client:
 
     # -- translation endpoints -----------------------------------------------
 
-    def latin_to_english(self, word: str) -> Any:
+    async def latin_to_english(self, word: str) -> Any:
         """Look up a Latin word and get English definitions.
 
         Args:
@@ -101,9 +101,9 @@ class Client:
         Returns:
             The translation data from the API.
         """
-        return self._request(f"la-to-en/{word}")
+        return await self._request(f"la-to-en/{word}")
 
-    def english_to_latin(self, word: str) -> Any:
+    async def english_to_latin(self, word: str) -> Any:
         """Look up an English word and get Latin equivalents.
 
         Args:
@@ -112,9 +112,9 @@ class Client:
         Returns:
             The translation data from the API.
         """
-        return self._request(f"en-to-la/{word}")
+        return await self._request(f"en-to-la/{word}")
 
-    def auto_detect(self, text: str) -> Any:
+    async def auto_detect(self, text: str) -> Any:
         """Auto-detect the language and translate.
 
         Args:
@@ -123,11 +123,11 @@ class Client:
         Returns:
             The auto-detect result from the API.
         """
-        return self._request(f"auto-detect/{text}")
+        return await self._request(f"auto-detect/{text}")
 
     # -- parsing endpoints ---------------------------------------------------
 
-    def latin_parse(
+    async def latin_parse(
         self,
         text: str,
         *,
@@ -157,9 +157,9 @@ class Client:
             params["max_alternates"] = max_alternates
         if allow_fallback is not None:
             params["allow_fallback"] = allow_fallback
-        return self._request("latin-parse", params)
+        return await self._request("latin-parse", params)
 
-    def inflection_table(
+    async def inflection_table(
         self,
         lemma: str,
         *,
@@ -185,4 +185,4 @@ class Client:
             params["max_entries"] = max_entries
         if include_periphrastic is not None:
             params["include_periphrastic"] = include_periphrastic
-        return self._request("inflection-table", params)
+        return await self._request("inflection-table", params)

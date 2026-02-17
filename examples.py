@@ -1,17 +1,58 @@
-import latindictionary_io
+"""Examples for the latindictionary-io Python client."""
 
-# setup the api client
-dictionary = latindictionary_io.Client()
+import asyncio
 
-# parse words
-print(dictionary.analyze_word('canis'))
+from latindictionary_io import AsyncClient, Client
 
-# get word usage examples from anchient latin texts
-print(dictionary.get_concordance('canis'))
+# ---------------------------------------------------------------------------
+# Synchronous usage
+# ---------------------------------------------------------------------------
 
-# get english definition
-print(dictionary.get_definition('canis'))
 
-# get the word of the day from a specified date
-print(dictionary.get_word_of_the_day('2022-01-01'))
+def sync_examples() -> None:
+    with Client() as client:
+        # Latin to English
+        result = client.latin_to_english("canis")
+        print(f"  Latin->English: {result}")
 
+        # English to Latin
+        result = client.english_to_latin("dog")
+        print(f"  English->Latin: {result}")
+
+        # Auto-detect language and translate
+        result = client.auto_detect("amor")
+        print(f"  Auto-detect: {result}")
+
+        # AI-powered Latin parsing
+        result = client.latin_parse("Gallia est omnis divisa in partes tres")
+        print(f"  Parse result: {result}")
+
+        # Inflection table
+        result = client.inflection_table("amo")
+        print(f"  Inflection table: {result}")
+
+
+# ---------------------------------------------------------------------------
+# Asynchronous usage
+# ---------------------------------------------------------------------------
+
+
+async def async_examples() -> None:
+    async with AsyncClient() as client:
+        # All methods mirror the sync client, but are awaited
+        result = await client.latin_to_english("canis")
+        print(f"  Latin->English: {result}")
+
+        result = await client.auto_detect("amor")
+        print(f"  Auto-detect: {result}")
+
+        result = await client.latin_parse("Gallia est omnis divisa in partes tres")
+        print(f"  Parse result: {result}")
+
+
+if __name__ == "__main__":
+    print("=== Sync Examples ===")
+    sync_examples()
+
+    print("\n=== Async Examples ===")
+    asyncio.run(async_examples())

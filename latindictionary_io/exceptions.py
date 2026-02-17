@@ -1,30 +1,39 @@
-class APIException(Exception):
-    def __init__(self, response):
-        super(APIException, self).__init__()
+"""Custom exceptions for the latindictionary-io client."""
 
-        self.code = 0
-
-        try:
-            json_response = response.json()
-        except ValueError:
-            self.message = "JSON error message: {}".format(response.text)
-        else:
-            if "error" not in json_response:
-                self.message = "Wrong json format from API"
-            else:
-                self.message = json_response["error"]
-
-        self.status_code = response.status_code
-        self.response = response
-
-    def __str__(self):
-        return "APIException(status_code: {}): {}".format(self.status_code, self.message)
+from __future__ import annotations
 
 
-class RequestException(Exception):
-    def __init__(self, message):
-        super(RequestException, self).__init__()
+class LatinDictionaryError(Exception):
+    """Base exception for all latindictionary-io errors."""
+
+    def __init__(self, message: str) -> None:
         self.message = message
+        super().__init__(message)
 
-    def __str__(self):
-        return "RequestException: {}".format(self.message)
+
+class APIError(LatinDictionaryError):
+    """Raised when the API returns a non-success HTTP status code."""
+
+    def __init__(self, status_code: int, body: str) -> None:
+        self.status_code = status_code
+        self.body = body
+        super().__init__(f"API error {status_code}: {body}")
+
+
+class ConnectionError(LatinDictionaryError):
+    """Raised when a connection to the API cannot be established."""
+
+
+class TimeoutError(LatinDictionaryError):
+    """Raised when a request to the API times out."""
+
+
+class RateLimitError(APIError):
+    """Raised when the API returns HTTP 429 (Too Many Requests)."""
+
+    def __init__(self, status_code: int = 429, body: str = "Rate limited") -> None:
+        super().__init__(status_code, body)
+
+
+class InputValidationError(LatinDictionaryError):
+    """Raised when input parameters fail local validation."""
