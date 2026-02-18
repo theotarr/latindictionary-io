@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "latindictionary-io"
-version = "1.0.1"
+version = "1.0.2"
 description = "Python client for the latindictionary.io API — Latin↔English translation, word inspection, inflection tables, and more."
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 authors = [
     { name = "Theodore Tarr", email = "support@latindictionary.io" },
 ]
