@@ -1,4 +1,3 @@
-from __future__ import annotations
 """Pydantic v2 response models for the latindictionary.io REST API.
 
 All models use ``extra="allow"`` so every field returned by the API is
@@ -7,7 +6,7 @@ captured even when the schema here does not list it explicitly.
 
 
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -33,8 +32,8 @@ class AutoDetectResponse(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
-    language: str | None = None
-    data: Any = None
+    language: Optional[str] = None
+    data: Optional[Any] = None
 
 
 # ---------------------------------------------------------------------------
