@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import time
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -101,7 +102,7 @@ class Client:
         Returns:
             The translation data from the API.
         """
-        return self._request(f"la-to-en/{word}")
+        return self._request(f"la-to-en/{quote(word, safe='')}")
 
     def english_to_latin(self, word: str) -> Any:
         """Look up an English word and get Latin equivalents.
@@ -112,7 +113,7 @@ class Client:
         Returns:
             The translation data from the API.
         """
-        return self._request(f"en-to-la/{word}")
+        return self._request(f"en-to-la/{quote(word, safe='')}")
 
     def auto_detect(self, text: str) -> Any:
         """Auto-detect the language and translate.
@@ -123,7 +124,7 @@ class Client:
         Returns:
             The auto-detect result from the API.
         """
-        return self._request(f"auto-detect/{text}")
+        return self._request(f"auto-detect/{quote(text, safe='')}")
 
     # -- parsing endpoints ---------------------------------------------------
 
@@ -131,9 +132,9 @@ class Client:
         self,
         text: str,
         *,
-        model: Optional[str] = None,
-        max_candidates_per_token: Optional[int] = None,
-        max_alternates: Optional[int] = None,
+        model: str | None = None,
+        max_candidates_per_token: int | None = None,
+        max_alternates: int | None = None,
         allow_fallback: bool | None = None,
     ) -> Any:
         """AI-powered Latin text parsing.
@@ -163,8 +164,8 @@ class Client:
         self,
         lemma: str,
         *,
-        entry_id: Optional[str] = None,
-        max_entries: Optional[int] = None,
+        entry_id: str | None = None,
+        max_entries: int | None = None,
         include_periphrastic: bool | None = None,
     ) -> Any:
         """Get the inflection table for a Latin word.

@@ -33,7 +33,7 @@ class AutoDetectResponse(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
-    language: Optional[str] = None
+    language: str | None = None
     data: Any = None
 
 
